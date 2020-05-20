@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">لعبة خمن</string>
+    <string name="false_text">خطأ</string>
+    <string name="true_text">صحيح</string>
+    <string name="back_text">الرجوع</string>
+    <string name="share_question_text">نشر السؤال</string>
+    <string name="share_title_hint">ادخل عنوان المشاركة</string>
+    <string name="change_lang_text">تغيير اللغة</string>
+    <string name="question">السؤال</string>
+
+    <string-array name="questions">
+        <item>العملة الرسمية لدولة الكويت هي الريال الكويتي؟</item>
+        <item>توبقال هي أعلى قمة جبلية في العالم العربي؟</item>
+        <item>الجزائر هي أكبر دولة عربية من حيث المساحة؟</item>
+        <item>الدار البيضاء هي عاصمة المغرب؟</item>
+
+    </string-array>
+    <string-array name="answers_details">
+        <item>العملة الرسمية لدولة الكويت هي الدينار الكويتي</item>
+        <item>توبقال هي أعلى قمة جبلية في العالم العربي و تقع في المغرب</item>
+        <item>الجزائر هي أكبر دولة عربية و إفريقية من حيث المساحة</item>
+        <item>الرباط هي عاصمة المغرب</item>
+
+    </string-array>
+    
+    <array name="languages">
+        <item> العربية</item>
+        <item>English</item>
+        <item>Français</item>
+
+    </array>
+
+</resources>
