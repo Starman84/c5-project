@@ -52,10 +52,8 @@ final class TransactionsViewModel: ObservableObject {
 
     func undoEdit(context: ModelContext) {
         guard let snapshot = lastEditedSnapshot else { return }
-        let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { transaction in
-            transaction.id == snapshot.id
-        })
-        if let transaction = try? context.fetch(descriptor).first {
+        let transactions = (try? context.fetch(FetchDescriptor<Transaction>())) ?? []
+        if let transaction = transactions.first(where: { $0.id == snapshot.id }) {
             transaction.amount = snapshot.amount
             transaction.categoryName = snapshot.categoryName
             transaction.note = snapshot.note
@@ -82,18 +80,14 @@ final class TransactionsViewModel: ObservableObject {
     }
 
     private func checkCategoryLimit(categoryName: String, context: ModelContext) {
-        guard let category = try? context.fetch(FetchDescriptor<Category>(predicate: #Predicate<Category> { category in
-            category.name == categoryName
-        })).first else { return }
+        let categories = (try? context.fetch(FetchDescriptor<Category>())) ?? []
+        guard let category = categories.first(where: { $0.name == categoryName }) else { return }
         guard category.monthlyLimit > 0 else { return }
 
         let startOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
-        let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { transaction in
-            transaction.type == TransactionType.expense &&
-            transaction.categoryName == categoryName &&
-            transaction.date >= startOfMonth
-        })
-        let total = (try? context.fetch(descriptor).reduce(0) { $0 + $1.amount }) ?? 0
+        let transactions = (try? context.fetch(FetchDescriptor<Transaction>())) ?? []
+        let total = transactions.filter { $0.type == .expense && $0.categoryName == categoryName && $0.date >= startOfMonth }
+            .reduce(0) { $0 + $1.amount }
         let ratio = total / category.monthlyLimit
         if ratio >= 0.8 && ratio < 1.05 {
             NotificationManager.shared.scheduleLimitAlert(categoryName: categoryName, remainingPercentage: max(0, 1 - ratio))
