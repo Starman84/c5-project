@@ -52,7 +52,9 @@ final class TransactionsViewModel: ObservableObject {
 
     func undoEdit(context: ModelContext) {
         guard let snapshot = lastEditedSnapshot else { return }
-        let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate { $0.id == snapshot.id })
+        let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { transaction in
+            transaction.id == snapshot.id
+        })
         if let transaction = try? context.fetch(descriptor).first {
             transaction.amount = snapshot.amount
             transaction.categoryName = snapshot.categoryName
@@ -80,12 +82,16 @@ final class TransactionsViewModel: ObservableObject {
     }
 
     private func checkCategoryLimit(categoryName: String, context: ModelContext) {
-        guard let category = try? context.fetch(FetchDescriptor<Category>(predicate: #Predicate { $0.name == categoryName })).first else { return }
+        guard let category = try? context.fetch(FetchDescriptor<Category>(predicate: #Predicate<Category> { category in
+            category.name == categoryName
+        })).first else { return }
         guard category.monthlyLimit > 0 else { return }
 
         let startOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
-        let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate {
-            $0.type == .expense && $0.categoryName == categoryName && $0.date >= startOfMonth
+        let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { transaction in
+            transaction.type == TransactionType.expense &&
+            transaction.categoryName == categoryName &&
+            transaction.date >= startOfMonth
         })
         let total = (try? context.fetch(descriptor).reduce(0) { $0 + $1.amount }) ?? 0
         let ratio = total / category.monthlyLimit

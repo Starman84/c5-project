@@ -110,7 +110,7 @@ struct ExpensesView: View {
             .padding(.horizontal)
 
             if viewModel.selectedDate != nil {
-                DatePicker("اليوم", selection: Binding($viewModel.selectedDate, replacingNilWith: Date()), displayedComponents: .date)
+                DatePicker("اليوم", selection: selectedDateBinding, displayedComponents: .date)
                     .datePickerStyle(.compact)
                     .padding(.horizontal)
             }
@@ -170,8 +170,11 @@ struct ExpensesView: View {
     }
 }
 
-extension Binding where Value == Date? {
-    init(_ source: Binding<Date?>, replacingNilWith replacement: Date) {
-        self.init(get: { source.wrappedValue ?? replacement }, set: { newValue in source.wrappedValue = newValue })
+private extension ExpensesView {
+    var selectedDateBinding: Binding<Date> {
+        Binding(
+            get: { viewModel.selectedDate ?? Date() },
+            set: { viewModel.selectedDate = $0 }
+        )
     }
 }
